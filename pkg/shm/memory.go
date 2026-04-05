@@ -107,6 +107,11 @@ func (m *MemoryManager) Free(offset int64) error {
 			if b.Free {
 				return nil // Already free
 			}
+
+			// Secure wiping: zero out the memory block to comply with security standards
+			zeroBuf := make([]byte, b.Size)
+			copy(m.data[b.Offset:b.Offset+b.Size], zeroBuf)
+
 			m.blocks[i].Free = true
 			m.mergeFreeBlocks()
 			return nil

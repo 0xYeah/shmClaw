@@ -74,6 +74,19 @@ func TestMemoryManager(t *testing.T) {
 	if largeOffset != 0 {
 		t.Fatalf("Expected offset 0, got %d", largeOffset)
 	}
+
+	// Test secure wiping (zero-out on free)
+	testWipeOffset, _ := m.Allocate(10)
+	testData := []byte("secret1234")
+	m.Write(testWipeOffset, testData)
+	m.Free(testWipeOffset)
+
+	readAfterFree := make([]byte, 10)
+	m.Read(testWipeOffset, readAfterFree)
+	expectedZeros := make([]byte, 10)
+	if !bytes.Equal(readAfterFree, expectedZeros) {
+		t.Fatalf("Secure wiping failed: expected zeros, got %v", readAfterFree)
+	}
 }
 
 func TestMemoryManagerErrors(t *testing.T) {
