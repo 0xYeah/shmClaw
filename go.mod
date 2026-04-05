@@ -2,14 +2,15 @@ module github.com/0xYeah/shmClaw
 
 go 1.26.1
 
-require github.com/george012/gtbox v0.1.111
+require github.com/0xYeah/fltk2go v0.0.0-00010101000000-000000000000
 
 require (
-	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394 // indirect
-	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
-	github.com/lestrrat-go/strftime v1.1.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.25.0 // indirect
+	github.com/gen2brain/shm v0.1.1 // indirect
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
+	github.com/jezek/xgb v1.2.0 // indirect
+	github.com/kbinani/screenshot v0.0.0-20250624051815-089614a94018 // indirect
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
+	golang.org/x/sys v0.39.0 // indirect
 )
+
+replace github.com/0xYeah/fltk2go => ./gui/gui_fltk2go/fltk2go
