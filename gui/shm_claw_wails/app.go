@@ -3,18 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
+	"github.com/0xYeah/shmClaw/pkg/llm"
+	"github.com/0xYeah/shmClaw/pkg/orchestrator"
 	"github.com/0xYeah/shmClaw/pkg/shm"
 	"github.com/0xYeah/shmClaw/pkg/tagmatrix"
-	"github.com/0xYeah/shmClaw/pkg/orchestrator"
 )
 
 // App struct
 type App struct {
-	ctx     context.Context
-	memory  *shm.MemoryManager
-	matrix  *tagmatrix.Matrix
-	builder *orchestrator.ContextBuilder
+	ctx      context.Context
+	memory   *shm.MemoryManager
+	matrix   *tagmatrix.Matrix
+	builder  *orchestrator.ContextBuilder
+	provider orchestrator.LLMProvider
 }
 
 // NewApp creates a new App application struct
@@ -37,6 +40,15 @@ func (a *App) startup(ctx context.Context) {
 
 	a.matrix = tagmatrix.NewMatrix()
 	a.builder = orchestrator.NewContextBuilder(a.matrix, a.memory, 128)
+
+	// Initialize LLM Provider (read from env or use default/dummy)
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	baseURL := os.Getenv("OPENAI_BASE_URL")
+	if baseURL == "" {
+		baseURL = "https://api.openai.com/v1"
+	}
+	// For local testing, you might use Ollama: baseURL = "http://localhost:11434/v1"
+	a.provider = llm.NewOpenAIProvider(baseURL, apiKey, "gpt-4")
 }
 
 // shutdown is called when the app closes
@@ -91,4 +103,18 @@ func (a *App) QueryContext(sessionID string) string {
 		return "No context found for session " + sessionID
 	}
 	return prompt
+}
+
+// AskModel queries the LLM provider directly with the given prompt.
+func (a *App) AskModel(prompt string) string {
+	if a.provider == nil {
+		return "Error: LLM provider not initialized"
+	}
+
+	response, err := a.provider.Generate(prompt)
+	if err != nil {
+		return fmt.Sprintf("Model Error: %v", err)
+	}
+
+	return response
 }
